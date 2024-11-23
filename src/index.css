@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+#root {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.main-content {
+  color: #333;
+}
+/* html, body, #root {
+  @apply w-full h-full
+}
+
+input {
+  @apply w-full border rounded-xl py-2 px-2.5 border-gray-300
+} */
+
+/* button {
+  @apply w-full rounded-xl py-2 px-2.5 bg-blue-400 text-white
+} */
