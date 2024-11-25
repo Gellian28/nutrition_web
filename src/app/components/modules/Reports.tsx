@@ -234,7 +234,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { getAssessments, getUsersBMI, getUsers } from "../../../shared/firestore";
-
 const Reports: React.FC = () => {
   const [bmiSummary, setBmiSummary] = useState<{ [key: string]: number }>({
     underweight: 0,
@@ -308,29 +307,69 @@ const Reports: React.FC = () => {
 
   return (
     <section id="reports" className="mb-8">
-      <h2 className="text-2xl mb-2 text-pink-500">Reports</h2>
-      <div className="flex flex-col md:flex-row justify-between mb-4">
-        <div className="mb-4 md:mb-0">
-          <h3 className="text-lg mb-2">BMI Summary</h3>
-          <ul>
-            <li>Underweight: {bmiSummary.underweight.toFixed(2)}%</li>
-            <li>Normal: {bmiSummary.normal.toFixed(2)}%</li>
-            <li>Overweight: {bmiSummary.overweight.toFixed(2)}%</li>
-            <li>Obese: {bmiSummary.obese.toFixed(2)}%</li>
-          </ul>
-        </div>
-        <div className="mb-4 md:mb-0">
-          <h3 className="text-lg mb-2">Health Issues Summary</h3>
-          <ul>
-            <li>Arthritis: {healthIssuesSummary.arthritis.toFixed(2)}%</li>
-            <li>Diabetes: {healthIssuesSummary.diabetes.toFixed(2)}%</li>
-            <li>Hypertension: {healthIssuesSummary.hypertension.toFixed(2)}%</li>
-            <li>Heart Disease: {healthIssuesSummary.heartDisease.toFixed(2)}%</li>
-            <li>Cancer: {healthIssuesSummary.cancer.toFixed(2)}%</li>
-          </ul>
-        </div>
-      </div>
-    </section>
+  <h2 className="text-2xl mb-2 text-pink-500">Reports</h2>
+  <div className="overflow-x-auto">
+    <table className="min-w-full bg-white border border-gray-300">
+      <thead>
+        <tr>
+          <th className="px-6 py-3 border-b-2 bg-gray-100 text-left">BMI Category</th>
+          <th className="px-6 py-3 border-b-2 bg-gray-100 text-left">Percentage</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td className="px-6 py-2 border-b">Underweight</td>
+          <td className="px-6 py-2 border-b">{bmiSummary.underweight.toFixed(2)}%</td>
+        </tr>
+        <tr>
+          <td className="px-6 py-2 border-b">Normal</td>
+          <td className="px-6 py-2 border-b">{bmiSummary.normal.toFixed(2)}%</td>
+        </tr>
+        <tr>
+          <td className="px-6 py-2 border-b">Overweight</td>
+          <td className="px-6 py-2 border-b">{bmiSummary.overweight.toFixed(2)}%</td>
+        </tr>
+        <tr>
+          <td className="px-6 py-2 border-b">Obese</td>
+          <td className="px-6 py-2 border-b">{bmiSummary.obese.toFixed(2)}%</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div></div>
+  <div className="overflow-x-auto">
+    <table className="min-w-full bg-white border border-gray-300">
+      <thead>
+        <tr>
+          <th className="px-6 py-3 border-b-2 bg-gray-100 text-left">Health Issue</th>
+          <th className="px-6 py-3 border-b-2 bg-gray-100 text-left">Percentage</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td className="px-6 py-2 border-b">Arthritis</td>
+          <td className="px-6 py-2 border-b">{healthIssuesSummary.arthritis.toFixed(2)}%</td>
+        </tr>
+        <tr>
+          <td className="px-6 py-2 border-b">Diabetes</td>
+          <td className="px-6 py-2 border-b">{healthIssuesSummary.diabetes.toFixed(2)}%</td>
+        </tr>
+        <tr>
+          <td className="px-6 py-2 border-b">Hypertension</td>
+          <td className="px-6 py-2 border-b">{healthIssuesSummary.hypertension.toFixed(2)}%</td>
+        </tr>
+        <tr>
+          <td className="px-6 py-2 border-b">Heart Disease</td>
+          <td className="px-6 py-2 border-b">{healthIssuesSummary.heartDisease.toFixed(2)}%</td>
+        </tr>
+        <tr>
+          <td className="px-6 py-2 border-b">Cancer</td>
+          <td className="px-6 py-2 border-b">{healthIssuesSummary.cancer.toFixed(2)}%</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
   );
 };
 
