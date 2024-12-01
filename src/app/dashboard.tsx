@@ -1,20 +1,10 @@
-// import Profile from "../app/user/profile";
-
-// function Dashboard() {
-//   return (
-//     <Profile />
-//   )  
-// }
-
-// export default Dashboard
-
 import React, { useState } from 'react';
 import Profile from "../app/user/profile";
 import Users from './components/modules/Users';
 import Dashboard from './components/modules/Dashboard';
 import Reports from './components/modules/Reports';
 import { Button } from '../components/ui/button';
-import MealPlanForm from './components/modules/MealPlans';
+// import MealPlanForm from './components/modules/MealPlans';
 //import MealPlanTable from './MealPlanTable';
 
 const AdminDashboard: React.FC = () => {
@@ -33,8 +23,8 @@ const AdminDashboard: React.FC = () => {
         return <Users />;
       case 'reports':
         return <Reports />;
-      case 'meal-plan':
-        return <MealPlanForm />;
+      // case 'meal-plan':
+      //   return <MealPlanForm />;
       default:
         return null;
     }
@@ -85,14 +75,14 @@ const AdminDashboard: React.FC = () => {
                 Reports
               </Button>
             </li>
-            <li>
+            {/* <li>
               <Button
                 className="block text-pink-500"
                 onClick={() => setSelectedPage('meal-plan')}
               >
                 Meal Plans
               </Button>
-            </li>
+            </li> */}
           </ul>
         </nav>
         <main className="flex-1 p-4 bg-slate-50">{renderSelectedPage()}</main>
