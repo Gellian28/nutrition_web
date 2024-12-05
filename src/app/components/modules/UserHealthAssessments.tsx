@@ -1348,6 +1348,543 @@
 
 // export default UserHealthAssessments;
 
+// import React, { useEffect, useState } from 'react';
+// import { getAssessments, getUsers, getUsersBMI, updateUser, deleteUser } from '../../../shared/firestore';
+
+// interface UserHealthAssessmentsProps {
+//   id: string;
+// }
+
+// const UserHealthAssessments: React.FC<UserHealthAssessmentsProps> = ({ id }) => {
+//   const [registrationData, setRegistrationData] = useState<any | null>(null);
+//   const [bmiData, setBmiData] = useState<any | null>(null);
+//   const [healthAssessmentData, setHealthAssessmentData] = useState<any | null>(null);
+//   const [error, setError] = useState<string | null>(null);
+//   const [editMode, setEditMode] = useState<boolean>(false);
+//   const [formData, setFormData] = useState<any>({});
+//   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+//   useEffect(() => {
+//     const fetchData = async () => {
+//       try {
+//         const [registrations, healthAssessments, usersBmi] = await Promise.all([
+//           getUsers(),
+//           getAssessments(),
+//           getUsersBMI(),
+//         ]);
+
+//         const userRegistration = registrations.find(user => user.id === id) || {};
+//         const userHealthAssessment = healthAssessments.find(assessment => assessment.id === id) || {};
+//         const userBmi = usersBmi.find(bmi => bmi.id === id) || {};
+
+//         console.log('User Registration:', userRegistration);
+//         console.log('User Health Assessment:', userHealthAssessment);
+//         console.log('User BMI:', userBmi);
+
+//         setRegistrationData(userRegistration);
+//         setHealthAssessmentData(userHealthAssessment);
+//         setBmiData(userBmi);
+//         setFormData({ ...userRegistration, ...userBmi, healthAssessment: userHealthAssessment });
+//       } catch (error) {
+//         console.error('Error fetching data:', error);
+//         setError('Error fetching data');
+//       }
+//     };
+
+//     fetchData();
+//   }, [id]);
+
+//   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+//     const { name, value, type, checked } = e.target;
+//     setFormData({ ...formData, [name]: type === 'checkbox' ? checked : value });
+//   };
+
+//   const handleUpdate = async () => {
+//     try {
+//       if (registrationData) {
+//         await updateUser('registrations', id, {
+//           firstname: formData.firstname,
+//           lastname: formData.lastname,
+//           email: formData.email,
+//           phone: formData.phone,
+//           city: formData.city,
+//         });
+//       }
+
+//       if (bmiData) {
+//         await updateUser('users_bmi', id, {
+//           age: formData.age,
+//           bmi: formData.bmi,
+//           height: formData.height,
+//           weight: formData.weight,
+//         });
+//       }
+
+//       if (healthAssessmentData) {
+//         await updateUser('health_assessments', id, formData.healthAssessment);
+//       }
+
+//       setEditMode(false);
+//       setSuccessMessage('User data updated successfully!');
+//     } catch (error) {
+//       console.error('Error updating user:', error);
+//       setError('Error updating user');
+//     }
+//   };
+
+//   const handleDelete = async () => {
+//     try {
+//       if (registrationData) await deleteUser('registrations', id);
+//       if (bmiData) await deleteUser('users_bmi', id);
+//       if (healthAssessmentData) await deleteUser('health_assessments', id);
+
+//       setRegistrationData(null);
+//       setBmiData(null);
+//       setHealthAssessmentData(null);
+//       setSuccessMessage('User data deleted successfully!');
+//     } catch (error) {
+//       console.error('Error deleting user:', error);
+//       setError('Error deleting user');
+//     }
+//   };
+
+//   if (error) {
+//     return <p className="text-red-500">{error}</p>;
+//   }
+
+//   if (!registrationData && !bmiData && !healthAssessmentData) {
+//     return <p>No user data found for {id}.</p>;
+//   }
+
+//   return (
+//     <section id="user-data" className="mb-8 p-4 border border-gray-200 rounded-lg shadow-md">
+//       <h2 className="text-2xl mb-4 text-pink-500">User Data</h2>
+//       {successMessage && <p className="text-green-500 mb-4">{successMessage}</p>}
+//       <div className="mb-8">
+//         {editMode ? (
+//           <form className="space-y-4">
+//             <h3 className="text-xl mb-2">Edit Registration Data</h3>
+//             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+//               {['firstname', 'lastname', 'email', 'phone', 'city'].map(field => (
+//                 <div key={field}>
+//                   <label className="block text-sm font-medium text-gray-700">{field.charAt(0).toUpperCase() + field.slice(1)}</label>
+//                   <input
+//                     type="text"
+//                     name={field}
+//                     value={formData[field] || ''}
+//                     onChange={handleInputChange}
+//                     className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm"
+//                     placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
+//                   />
+//                 </div>
+//               ))}
+//             </div>
+
+//             <h3 className="text-xl mb-2">Edit BMI Data</h3>
+//             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+//               {['age', 'bmi', 'height', 'weight'].map(field => (
+//                 <div key={field}>
+//                   <label className="block text-sm font-medium text-gray-700">{field.charAt(0).toUpperCase() + field.slice(1)} {field === 'height' ? '(cm)' : field === 'weight' ? '(kg)' : ''}</label>
+//                   <input
+//                     type="number"
+//                     name={field}
+//                     value={formData[field] || 0}
+//                     onChange={handleInputChange}
+//                     className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm"
+//                     placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
+//                   />
+//                 </div>
+//               ))}
+//             </div>
+
+//             <h3 className="text-xl mb-2">Edit Health Assessment Data</h3>
+//             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+//               {Object.keys(formData.healthAssessment || {}).map(field => (
+//                 <label key={field} className="flex items-center">
+//                   <input
+//                     type="checkbox"
+//                     name={field}
+//                     checked={formData.healthAssessment[field] || false}
+//                     onChange={handleInputChange}
+//                     className="form-checkbox"
+//                   />
+//                   <span className="ml-2">{field.charAt(0).toUpperCase() + field.slice(1).replace(/([A-Z])/g, ' \\\$1')}</span>
+//                 </label>
+//               ))}
+//             </div>
+
+//             <div className="flex justify-end space-x-4 mt-4">
+//               <button
+//                 type="button"
+//                 onClick={handleUpdate}
+//                 className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+//               >
+//                 Save
+//               </button>
+//               <button
+//                 type="button"
+//                 onClick={() => setEditMode(false)}
+//                 className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+//               >
+//                 Cancel
+//               </button>
+//             </div>
+//           </form>
+//         ) : (
+//           <div>
+//             <h3 className="text-xl mb-2">Registration Data</h3>
+//             <table className="min-w-full bg-white border border-gray-200 mb-4">
+//               <thead>
+//                 <tr>
+//                   <th className="py-2 px-4 border-b">Field</th>
+//                   <th className="py-2 px-4 border-b">Value</th>
+//                 </tr>
+//               </thead>
+//               <tbody>
+//                 {registrationData && Object.keys(registrationData).map(field => (
+//                   <tr key={field}>
+//                     <td className="py-2 px-4 border-b">{field.charAt(0).toUpperCase() + field.slice(1)}</td>
+//                     <td className="py-2 px-4 border-b">{registrationData[field] || 'N/A'}</td>
+//                   </tr>
+//                 ))}
+//               </tbody>
+//             </table>
+
+//             <h3 className="text-xl mb-2">BMI Data</h3>
+//             <table className="min-w-full bg-white border border-gray-200 mb-4">
+//               <thead>
+//                 <tr>
+//                   <th className="py-2 px-4 border-b">Field</th>
+//                   <th className="py-2 px-4 border-b">Value</th>
+//                 </tr>
+//               </thead>
+//               <tbody>
+//                 {bmiData && Object.keys(bmiData).map(field => (
+//                   <tr key={field}>
+//                     <td className="py-2 px-4 border-b">{field.charAt(0).toUpperCase() + field.slice(1)}</td>
+//                     <td className="py-2 px-4 border-b">{bmiData[field] || 'N/A'}</td>
+//                   </tr>
+//                 ))}
+//               </tbody>
+//             </table>
+
+//             <h3 className="text-xl mb-2">Health Assessment Data</h3>
+//             <table className="min-w-full bg-white border border-gray-200">
+//               <thead>
+//                 <tr>
+//                   <th className="py-2 px-4 border-b">Field</th>
+//                   <th className="py-2 px-4 border-b">Value</th>
+//                 </tr>
+//               </thead>
+//               <tbody>
+//                 {healthAssessmentData && Object.keys(healthAssessmentData).map(field => (
+//                   <tr key={field}>
+//                     <td className="py-2 px-4 border-b">{field.charAt(0).toUpperCase() + field.slice(1)}</td>
+//                     <td className="py-2 px-4 border-b">{healthAssessmentData[field] || 'N/A'}</td>
+//                   </tr>
+//                 ))}
+//               </tbody>
+//             </table>
+
+//             <div className="flex justify-end space-x-4 mt-4">
+//               <button
+//                 onClick={() => setEditMode(true)}
+//                 className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded"
+//               >
+//                 Edit
+//               </button>
+//               <button
+//                 onClick={handleDelete}
+//                 className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+//               >
+//                 Delete
+//               </button>
+//             </div>
+//           </div>
+//         )}
+//       </div>
+//     </section>
+//   );
+// };
+
+// export default UserHealthAssessments;
+
+// import React, { useEffect, useState } from 'react';
+// import { getAssessments, getUsers, getUsersBMI, updateUser, deleteUser } from '../../../shared/firestore';
+
+// interface UserHealthAssessmentsProps {
+//   id: string;
+// }
+
+// const UserHealthAssessments: React.FC<UserHealthAssessmentsProps> = ({ id }) => {
+//   const [registrationData, setRegistrationData] = useState<any | null>(null);
+//   const [bmiData, setBmiData] = useState<any | null>(null);
+//   const [healthAssessmentData, setHealthAssessmentData] = useState<any | null>(null);
+//   const [error, setError] = useState<string | null>(null);
+//   const [editMode, setEditMode] = useState<boolean>(false);
+//   const [formData, setFormData] = useState<any>({});
+//   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+//   useEffect(() => {
+//     const fetchData = async () => {
+//       try {
+//         const [registrations, healthAssessments, usersBmi] = await Promise.all([
+//           getUsers(),
+//           getAssessments(),
+//           getUsersBMI(),
+//         ]);
+
+//         const userRegistration = registrations.find(user => user.id === id) || {};
+//         const userHealthAssessment = healthAssessments.find(assessment => assessment.id === id) || {};
+//         const userBmi = usersBmi.find(bmi => bmi.id === id) || {};
+
+//         // Mock data for BMI and Health Assessment if not found in Firebase
+//         const mockBmiData = userBmi.id ? userBmi : {
+//           age: 30,
+//           bmi: 22.5,
+//           height: 175,
+//           weight: 70,
+//         };
+
+//         const mockHealthAssessmentData = userHealthAssessment.id ? userHealthAssessment : {
+//           bloodPressure: '120/80',
+//           cholesterol: 'Normal',
+//           diabetes: 'No',
+//           heartDisease: 'No',
+//         };
+
+//         console.log('User Registration:', userRegistration);
+//         console.log('User Health Assessment:', mockHealthAssessmentData);
+//         console.log('User BMI:', mockBmiData);
+
+//         setRegistrationData(userRegistration);
+//         setHealthAssessmentData(mockHealthAssessmentData);
+//         setBmiData(mockBmiData);
+//         setFormData({ ...userRegistration, ...mockBmiData, healthAssessment: mockHealthAssessmentData });
+//       } catch (error) {
+//         console.error('Error fetching data:', error);
+//         setError('Error fetching data');
+//       }
+//     };
+
+//     fetchData();
+//   }, [id]);
+
+//   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+//     const { name, value, type, checked } = e.target;
+//     setFormData({ ...formData, [name]: type === 'checkbox' ? checked : value });
+//   };
+
+//   const handleUpdate = async () => {
+//     try {
+//       if (registrationData) {
+//         await updateUser('registrations', id, {
+//           firstname: formData.firstname,
+//           lastname: formData.lastname,
+//           email: formData.email,
+//           phone: formData.phone,
+//           city: formData.city,
+//         });
+//       }
+
+//       if (bmiData) {
+//         await updateUser('users_bmi', id, {
+//           age: formData.age,
+//           bmi: formData.bmi,
+//           height: formData.height,
+//           weight: formData.weight,
+//         });
+//       }
+
+//       if (healthAssessmentData) {
+//         await updateUser('health_assessments', id, formData.healthAssessment);
+//       }
+
+//       setEditMode(false);
+//       setSuccessMessage('User data updated successfully!');
+//     } catch (error) {
+//       console.error('Error updating user:', error);
+//       setError('Error updating user');
+//     }
+//   };
+
+//   const handleDelete = async () => {
+//     try {
+//       if (registrationData) await deleteUser('registrations', id);
+//       if (bmiData) await deleteUser('users_bmi', id);
+//       if (healthAssessmentData) await deleteUser('health_assessments', id);
+
+//       setRegistrationData(null);
+//       setBmiData(null);
+//       setHealthAssessmentData(null);
+//       setSuccessMessage('User data deleted successfully!');
+//     } catch (error) {
+//       console.error('Error deleting user:', error);
+//       setError('Error deleting user');
+//     }
+//   };
+
+//   if (error) {
+//     return <p className="text-red-500">{error}</p>;
+//   }
+
+//   if (!registrationData && !bmiData && !healthAssessmentData) {
+//     return <p>No user data found for {id}.</p>;
+//   }
+
+//   return (
+//     <section id="user-data" className="mb-8 p-4 border border-gray-200 rounded-lg shadow-md">
+//       <h2 className="text-2xl mb-4 text-pink-500">User Data</h2>
+//       {successMessage && <p className="text-green-500 mb-4">{successMessage}</p>}
+//       <div className="mb-8">
+//         {editMode ? (
+//           <form className="space-y-4">
+//             <h3 className="text-xl mb-2">Edit Registration Data</h3>
+//             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+//               {['firstname', 'lastname', 'email', 'phone', 'city'].map(field => (
+//                 <div key={field}>
+//                   <label className="block text-sm font-medium text-gray-700">{field.charAt(0).toUpperCase() + field.slice(1)}</label>
+//                   <input
+//                     type="text"
+//                     name={field}
+//                     value={formData[field] || ''}
+//                     onChange={handleInputChange}
+//                     className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm"
+//                     placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
+//                   />
+//                 </div>
+//               ))}
+//             </div>
+
+//             <h3 className="text-xl mb-2">Edit BMI Data</h3>
+//             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+//               {['age', 'bmi', 'height', 'weight'].map(field => (
+//                 <div key={field}>
+//                   <label className="block text-sm font-medium text-gray-700">{field.charAt(0).toUpperCase() + field.slice(1)} {field === 'height' ? '(cm)' : field === 'weight' ? '(kg)' : ''}</label>
+//                   <input
+//                     type="number"
+//                     name={field}
+//                     value={formData[field] || 0}
+//                     onChange={handleInputChange}
+//                     className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm"
+//                     placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
+//                   />
+//                 </div>
+//               ))}
+//             </div>
+
+//             <h3 className="text-xl mb-2">Edit Health Assessment Data</h3>
+//             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+//               {Object.keys(formData.healthAssessment || {}).map(field => (
+//                 <label key={field} className="flex items-center">
+//                   <input
+//                     type="checkbox"
+//                     name={field}
+//                     checked={formData.healthAssessment[field] || false}
+//                     onChange={handleInputChange}
+//                     className="form-checkbox"
+//                   />
+//                   <span className="ml-2">{field.charAt(0).toUpperCase() + field.slice(1).replace(/([A-Z])/g, ' \\\$1')}</span>
+//                 </label>
+//               ))}
+//             </div>
+
+//             <div className="flex justify-end space-x-4 mt-4">
+//               <button
+//                 type="button"
+//                 onClick={handleUpdate}
+//                 className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+//               >
+//                 Save
+//               </button>
+//               <button
+//                 type="button"
+//                 onClick={() => setEditMode(false)}
+//                 className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+//               >
+//                 Cancel
+//               </button>
+//             </div>
+//           </form>
+//         ) : (
+//           <div>
+//             <h3 className="text-xl mb-2">Registration Data</h3>
+//             <table className="min-w-full bg-white border border-gray-200 mb-4">
+//               <thead>
+//                 <tr>
+//                   <th className="py-2 px-4 border-b">Field</th>
+//                   <th className="py-2 px-4 border-b">Value</th>
+//                 </tr>
+//               </thead>
+//               <tbody>
+//                 {registrationData && Object.keys(registrationData).map(field => (
+//                   <tr key={field}>
+//                     <td className="py-2 px-4 border-b">{field.charAt(0).toUpperCase() + field.slice(1)}</td>
+//                     <td className="py-2 px-4 border-b">{registrationData[field] || 'N/A'}</td>
+//                   </tr>
+//                 ))}
+//               </tbody>
+//             </table>
+
+//             <h3 className="text-xl mb-2">BMI Data</h3>
+//             <table className="min-w-full bg-white border border-gray-200 mb-4">
+//               <thead>
+//                 <tr>
+//                   <th className="py-2 px-4 border-b">Field</th>
+//                   <th className="py-2 px-4 border-b">Value</th>
+//                 </tr>
+//               </thead>
+//               <tbody>
+//                 {bmiData && Object.keys(bmiData).map(field => (
+//                   <tr key={field}>
+//                     <td className="py-2 px-4 border-b">{field.charAt(0).toUpperCase() + field.slice(1)}</td>
+//                     <td className="py-2 px-4 border-b">{bmiData[field] || 'N/A'}</td>
+//                   </tr>
+//                 ))}
+//               </tbody>
+//             </table>
+
+//             <h3 className="text-xl mb-2">Health Assessment Data</h3>
+//             <table className="min-w-full bg-white border border-gray-200">
+//               <thead>
+//                 <tr>
+//                   <th className="py-2 px-4 border-b">Field</th>
+//                   <th className="py-2 px-4 border-b">Value</th>
+//                 </tr>
+//               </thead>
+//               <tbody>
+//                 {healthAssessmentData && Object.keys(healthAssessmentData).map(field => (
+//                   <tr key={field}>
+//                     <td className="py-2 px-4 border-b">{field.charAt(0).toUpperCase() + field.slice(1)}</td>
+//                     <td className="py-2 px-4 border-b">{healthAssessmentData[field] || 'N/A'}</td>
+//                   </tr>
+//                 ))}
+//               </tbody>
+//             </table>
+
+//             <div className="flex justify-end space-x-4 mt-4">
+//               <button
+//                 onClick={() => setEditMode(true)}
+//                 className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded"
+//               >
+//                 Edit
+//               </button>
+//               <button
+//                 onClick={handleDelete}
+//                 className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+//               >
+//                 Delete
+//               </button>
+//             </div>
+//           </div>
+//         )}
+//       </div>
+//     </section>
+//   );
+// };
+
+// export default UserHealthAssessments;
+
 import React, { useEffect, useState } from 'react';
 import { getAssessments, getUsers, getUsersBMI, updateUser, deleteUser } from '../../../shared/firestore';
 
@@ -1370,21 +1907,32 @@ const UserHealthAssessments: React.FC<UserHealthAssessmentsProps> = ({ id }) => 
         const [registrations, healthAssessments, usersBmi] = await Promise.all([
           getUsers(),
           getAssessments(),
-          getUsersBMI(),
+          getUsersBMI()
         ]);
 
         const userRegistration = registrations.find(user => user.id === id) || {};
         const userHealthAssessment = healthAssessments.find(assessment => assessment.id === id) || {};
         const userBmi = usersBmi.find(bmi => bmi.id === id) || {};
 
-        console.log('User Registration:', userRegistration);
-        console.log('User Health Assessment:', userHealthAssessment);
-        console.log('User BMI:', userBmi);
+        // Mock data for BMI and Health Assessment if not found in Firebase
+        const mockBmiData = userBmi.id ? userBmi : {
+          age: 30,
+          bmi: 22.5,
+          height: 175,
+          weight: 70,
+        };
+
+        const mockHealthAssessmentData = userHealthAssessment.id ? userHealthAssessment : {
+          bloodPressure: '120/80',
+          cholesterol: 'Normal',
+          diabetes: 'No',
+          heartDisease: 'No',
+        };
 
         setRegistrationData(userRegistration);
-        setHealthAssessmentData(userHealthAssessment);
-        setBmiData(userBmi);
-        setFormData({ ...userRegistration, ...userBmi, healthAssessment: userHealthAssessment });
+        setHealthAssessmentData(mockHealthAssessmentData);
+        setBmiData(mockBmiData);
+        setFormData({ ...userRegistration });
       } catch (error) {
         console.error('Error fetching data:', error);
         setError('Error fetching data');
@@ -1401,6 +1949,7 @@ const UserHealthAssessments: React.FC<UserHealthAssessmentsProps> = ({ id }) => 
 
   const handleUpdate = async () => {
     try {
+      // Update Registration Data only
       if (registrationData) {
         await updateUser('registrations', id, {
           firstname: formData.firstname,
@@ -1411,21 +1960,8 @@ const UserHealthAssessments: React.FC<UserHealthAssessmentsProps> = ({ id }) => 
         });
       }
 
-      if (bmiData) {
-        await updateUser('users_bmi', id, {
-          age: formData.age,
-          bmi: formData.bmi,
-          height: formData.height,
-          weight: formData.weight,
-        });
-      }
-
-      if (healthAssessmentData) {
-        await updateUser('health_assessments', id, formData.healthAssessment);
-      }
-
       setEditMode(false);
-      setSuccessMessage('User data updated successfully!');
+      setSuccessMessage('User registration data updated successfully!');
     } catch (error) {
       console.error('Error updating user:', error);
       setError('Error updating user');
@@ -1434,6 +1970,7 @@ const UserHealthAssessments: React.FC<UserHealthAssessmentsProps> = ({ id }) => 
 
   const handleDelete = async () => {
     try {
+      // Delete user data from Firebase
       if (registrationData) await deleteUser('registrations', id);
       if (bmiData) await deleteUser('users_bmi', id);
       if (healthAssessmentData) await deleteUser('health_assessments', id);
@@ -1477,39 +2014,6 @@ const UserHealthAssessments: React.FC<UserHealthAssessmentsProps> = ({ id }) => 
                     placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
                   />
                 </div>
-              ))}
-            </div>
-
-            <h3 className="text-xl mb-2">Edit BMI Data</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {['age', 'bmi', 'height', 'weight'].map(field => (
-                <div key={field}>
-                  <label className="block text-sm font-medium text-gray-700">{field.charAt(0).toUpperCase() + field.slice(1)} {field === 'height' ? '(cm)' : field === 'weight' ? '(kg)' : ''}</label>
-                  <input
-                    type="number"
-                    name={field}
-                    value={formData[field] || 0}
-                    onChange={handleInputChange}
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm"
-                    placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
-                  />
-                </div>
-              ))}
-            </div>
-
-            <h3 className="text-xl mb-2">Edit Health Assessment Data</h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {Object.keys(formData.healthAssessment || {}).map(field => (
-                <label key={field} className="flex items-center">
-                  <input
-                    type="checkbox"
-                    name={field}
-                    checked={formData.healthAssessment[field] || false}
-                    onChange={handleInputChange}
-                    className="form-checkbox"
-                  />
-                  <span className="ml-2">{field.charAt(0).toUpperCase() + field.slice(1).replace(/([A-Z])/g, ' \\\$1')}</span>
-                </label>
               ))}
             </div>
 
@@ -1608,3 +2112,7 @@ const UserHealthAssessments: React.FC<UserHealthAssessmentsProps> = ({ id }) => 
 };
 
 export default UserHealthAssessments;
+
+
+
+
